@@ -6,8 +6,11 @@ public class MeshGenerator : MonoBehaviour {
 
 	public SquareGrid squareGrid;
     public MeshFilter walls;
+    public MeshFilter cave;
 	List<Vector3> vertices;
 	List<int> triangles;
+
+    public bool is2D;
 
     Dictionary<int,List<Triangle>> triangleDictionary = new Dictionary<int,List<Triangle>>();
     List<List<int>> outlines = new List<List<int>>();
@@ -31,13 +34,15 @@ public class MeshGenerator : MonoBehaviour {
 		}
 
 		Mesh mesh = new Mesh();
-		GetComponent<MeshFilter>().mesh = mesh;
+		cave.mesh = mesh;
 
 		mesh.vertices = vertices.ToArray();
 		mesh.triangles = triangles.ToArray();
 		mesh.RecalculateNormals();
 
-        CreateWallMesh();
+        if (!is2D) {
+            CreateWallMesh();
+        }
 
 	}
 
@@ -70,6 +75,9 @@ public class MeshGenerator : MonoBehaviour {
         wallMesh.vertices = wallVertices.ToArray();
         wallMesh.triangles = wallTriangles.ToArray();
         walls.mesh = wallMesh;
+
+        MeshCollider wallCollider = walls.gameObject.AddComponent<MeshCollider>();
+        wallCollider.sharedMesh = wallMesh;
     }
 
 	void TriangulateSquare(Square square) {
